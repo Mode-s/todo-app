@@ -17,7 +17,7 @@ export default function Home() {
       <h1>Todo App</h1>
       <form className={styles.form}>
         <input className={styles.input} type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="Todoを入力" />
-        <button className={styles.submit} type="submit" onSubmit={(e) => { e.preventDefault(); }}>+</button>
+        <button className={styles.submit} type="submit" >+</button>
       </form>
       <p>入力中: {inputValue}</p>
       <ul>
