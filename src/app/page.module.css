@@ -1,4 +1,4 @@
-.page {
+.main {
   --background: #D8CBE8;
   --foreground: #fff;
 
@@ -10,8 +10,58 @@
   --button-secondary-border: #ebebeb;
 
   display: flex;
-  flex: 1;
   flex-direction: column;
+  min-height: 100dvh;
+  padding: 40px 4.5%;
   font-family: var(--font-custom);
   background-color: var(--background);
+}
+
+.form {
+  display: flex;
+  justify-content: center;
+  max-width: 480px;
+  width: 100%;
+  gap: 30px;
+}
+
+.input {
+  flex: 1;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-radius: 50px;
+  outline: 2px solid #333;
+  outline-offset: 5px;
+  animation: outlinePoyon 0.4s ease;
+}
+
+@keyframes outlinePoyon {
+  0% {
+    outline-offset: 0;
+  }
+  50% {
+    outline-offset: 6px;
+  }
+  75% {
+    outline-offset: 1px;
+  }
+  100% {
+    outline-offset: 5px;
+  }
+}
+
+.submit {
+  display: block;
+  padding: 5px 10px;
+  outline: 2px solid #333;
+  border-radius: 50px;
+  font-size: 9px;
+  transition: transform 0.1s ease;
+}
+
+.submit:active {
+  transform: scale(1.2);
 }
