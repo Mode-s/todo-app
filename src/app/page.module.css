@@ -20,8 +20,7 @@
   font-family: var(--font-custom);
 }
 
-.title {
-}
+/*.title*/
 
 .form {
   display: flex;
@@ -71,6 +70,11 @@
 .checkButton {
   font-size: 24px;
   line-height: 0;
+  transition: transform 0.2s ease;
+}
+
+.checkButton:active {
+  transform: scale(1.2);
 }
 
 .text {
@@ -91,8 +95,23 @@
   transition: transform 0.4s ease;
 }
 
+.editInput {
+  animation: editIn 0.4s ease;
+}
+
+@keyframes editIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .textDone::after {
-  transform: ScaleX(1);
+  transform: scaleX(1);
 }
 
 .frame {
@@ -112,7 +131,7 @@
   stroke-dasharray: 14;
   stroke-dashoffset: 14;
   animation: draw 0.2s ease forwards;
-  animation-delay: 0.2s; /* 枠のフェードインが終わってから描き始める */
+  animation-delay: 0.2s;
 }
 
 @keyframes draw {

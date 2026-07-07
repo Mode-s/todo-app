@@ -18,6 +18,8 @@ export default function Home() {
   // setInputValue = inputValueを更新するための関数
   // useState('') = 最初の値は空です。と教えている。
   const [input, setInput] = useState('');
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editText, setEditText] = useState('');
 
   const addTodo = () => {
     if (input.trim() === '') return;
@@ -25,12 +27,28 @@ export default function Home() {
     setInput('');
   };
 
-  const removeTodo = (index: number) => {
-    setTodos(todos.filter((_, i) => i !== index));
-  };
-
   const toggleTodo = (index: number) => {
     setTodos(todos.map((todo, i) => (i === index ? { ...todo, done: !todo.done } : todo)));
+  };
+
+  const editMode = (index: number) => {
+    setEditIndex(index);
+    setEditText(todos[index].text);
+  };
+
+  const confirmEdit = () => {
+    if (editIndex === null) return;
+    const trimmed = editText.trim();
+    if (trimmed === '') {
+      removeTodo(editIndex);
+    } else {
+      setTodos(todos.map((todo, i) => (i === editIndex ? { ...todo, text: trimmed } : todo)));
+    }
+    setEditIndex(null);
+  };
+
+  const removeTodo = (index: number) => {
+    setTodos(todos.filter((_, i) => i !== index));
   };
 
   return (
@@ -60,7 +78,24 @@ export default function Home() {
                 </g>
               </svg>
             </button>
-            <span className={`${styles.text} ${todo.done ? styles.textDone : ''}`}>{todo.text}</span>
+            {editIndex === index ? (
+              <input
+                className={styles.editInput}
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                onBlur={confirmEdit}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') confirmEdit();
+                  if (e.key === 'Escape') setEditIndex(null);
+                }}
+                autoFocus
+              />
+            ) : (
+              <span className={`${styles.text} ${todo.done ? styles.textDone : ''}`} onDoubleClick={() => editMode(index)}>
+                {todo.text}
+              </span>
+            )}
+            {editIndex !== index && (<button type="button" onClick={() => editMode(index)}>編集</button>)}
             <button type="button" onClick={() => removeTodo(index)}>
               削除
             </button>
