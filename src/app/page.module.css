@@ -65,6 +65,18 @@
 .item {
   display: flex;
   align-items: center;
+  animation: itemIn 0.25s ease;
+}
+
+@keyframes itemIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .checkButton {
