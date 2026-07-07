@@ -7,6 +7,7 @@ import { useState } from 'react';
 import styles from './page.module.css';
 
 type Todo = {
+  id: string;
   text: string;
   done: boolean;
 };
@@ -20,10 +21,11 @@ export default function Home() {
   const [input, setInput] = useState('');
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
+  const [removeIndex, setRemoveIndex] = useState<number | null>(null);
 
   const addTodo = () => {
     if (input.trim() === '') return;
-    setTodos([...todos, { text: input, done: false }]);
+    setTodos([...todos, { id: crypto.randomUUID(), text: input, done: false }]);
     setInput('');
   };
 
@@ -51,6 +53,14 @@ export default function Home() {
     setTodos(todos.filter((_, i) => i !== index));
   };
 
+  const requestRemove = (index: number) => {
+    setRemoveIndex(index);
+    setTimeout(() => {
+      removeTodo(index);
+      setRemoveIndex(null)
+    }, 200);
+  }
+
   return (
     <main className={styles.main}>
       <h1 className={styles.title}>Todo App</h1>
@@ -66,7 +76,7 @@ export default function Home() {
       </form>
       <ul className={styles.list}>
         {todos.map((todo, index) => (
-          <li className={styles.item} key={index}>
+          <li className={`${styles.item} ${removeIndex === index ? styles.itemOut : ''}`} key={index}>
             <button className={styles.checkButton} type="button" role="checkbox" aria-checked={todo.done} aria-label={todo.done ? '未完了に戻す' : '完了にする'} onClick={() => toggleTodo(index)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                 <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
@@ -96,7 +106,7 @@ export default function Home() {
               </span>
             )}
             {editIndex !== index && (<button type="button" onClick={() => editMode(index)}>編集</button>)}
-            <button type="button" onClick={() => removeTodo(index)}>
+            <button type="button" onClick={() => requestRemove(index)}>
               削除
             </button>
           </li>
