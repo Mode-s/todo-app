@@ -1,9 +1,6 @@
 'use client';
 
-// 画面上で変化する値を管理するための機能。
 import { useState } from 'react';
-
-// import Image from "next/image";
 import styles from './page.module.css';
 
 type Todo = {
@@ -14,14 +11,10 @@ type Todo = {
 
 export default function Home() {
   const [todos, setTodos] = useState<Todo[]>([]);
-  // 入力欄の文字を管理している。
-  // inputValue = 現在の入力欄の値
-  // setInputValue = inputValueを更新するための関数
-  // useState('') = 最初の値は空です。と教えている。
   const [input, setInput] = useState('');
-  const [editIndex, setEditIndex] = useState<number | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
-  const [removeIndex, setRemoveIndex] = useState<number | null>(null);
+  const [removeId, setRemoveId] = useState<string | null>(null);
 
   const addTodo = () => {
     if (input.trim() === '') return;
@@ -29,37 +22,40 @@ export default function Home() {
     setInput('');
   };
 
-  const toggleTodo = (index: number) => {
-    setTodos(todos.map((todo, i) => (i === index ? { ...todo, done: !todo.done } : todo)));
+  // ① indexではなくidで対象を探して更新する
+  const toggleTodo = (id: string) => {
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, done: !todo.done } : todo)));
   };
 
-  const editMode = (index: number) => {
-    setEditIndex(index);
-    setEditText(todos[index].text);
+  const editMode = (id: string) => {
+    const target = todos.find((todo) => todo.id === id);
+    if (!target) return;
+    setEditId(id);
+    setEditText(target.text);
   };
 
   const confirmEdit = () => {
-    if (editIndex === null) return;
+    if (editId === null) return;
     const trimmed = editText.trim();
     if (trimmed === '') {
-      removeTodo(editIndex);
+      removeTodo(editId);
     } else {
-      setTodos(todos.map((todo, i) => (i === editIndex ? { ...todo, text: trimmed } : todo)));
+      setTodos(todos.map((todo) => (todo.id === editId ? { ...todo, text: trimmed } : todo)));
     }
-    setEditIndex(null);
+    setEditId(null);
   };
 
-  const removeTodo = (index: number) => {
-    setTodos(todos.filter((_, i) => i !== index));
+  const removeTodo = (id: string) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
   };
 
-  const requestRemove = (index: number) => {
-    setRemoveIndex(index);
+  const requestRemove = (id: string) => {
+    setRemoveId(id);
     setTimeout(() => {
-      removeTodo(index);
-      setRemoveIndex(null)
+      removeTodo(id);
+      setRemoveId(null);
     }, 200);
-  }
+  };
 
   return (
     <main className={styles.main}>
@@ -75,20 +71,31 @@ export default function Home() {
         <button className={styles.addButton}>+</button>
       </form>
       <ul className={styles.list}>
-        {todos.map((todo, index) => (
-          <li className={`${styles.item} ${removeIndex === index ? styles.itemOut : ''}`} key={index}>
-            <button className={styles.checkButton} type="button" role="checkbox" aria-checked={todo.done} aria-label={todo.done ? '未完了に戻す' : '完了にする'} onClick={() => toggleTodo(index)}>
+        {todos.map((todo) => (
+          <li className={`${styles.item} ${removeId === todo.id ? styles.itemOut : ''}`} key={todo.id}>
+            <button
+              className={styles.checkButton}
+              type="button"
+              role="checkbox"
+              aria-checked={todo.done}
+              aria-label={todo.done ? '未完了に戻す' : '完了にする'}
+              onClick={() => toggleTodo(todo.id)}
+            >
               <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                 <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
-                  {/* 枠。doneが切り替わるたびkeyでDOMを作り直し、CSSアニメーションを再生させる */}
-                  <path key={todo.done ? 'frame-on' : 'frame-off'} className={todo.done ? styles.frame : undefined} fill="currentColor" fillOpacity={todo.done ? undefined : 0} d="M4 12v-7c0 -0.55 0.45 -1 1 -1h14c0.55 0 1 0.45 1 1v14c0 0.55 -0.45 1 -1 1h-14c-0.55 0 -1 -0.45 -1 -1Z" />
-
-                  {/* チェックマーク。未完了時はDOMに存在させない */}
+                  <path
+                    key={todo.done ? 'frame-on' : 'frame-off'}
+                    className={todo.done ? styles.frame : undefined}
+                    fill="currentColor"
+                    fillOpacity={todo.done ? undefined : 0}
+                    d="M4 12v-7c0 -0.55 0.45 -1 1 -1h14c0.55 0 1 0.45 1 1v14c0 0.55 -0.45 1 -1 1h-14c-0.55 0 -1 -0.45 -1 -1Z"
+                  />
                   {todo.done && <path className={styles.check} d="M8 12l3 3l5 -5" />}
                 </g>
               </svg>
             </button>
-            {editIndex === index ? (
+
+            {editId === todo.id ? (
               <input
                 className={styles.editInput}
                 value={editText}
@@ -96,17 +103,25 @@ export default function Home() {
                 onBlur={confirmEdit}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') confirmEdit();
-                  if (e.key === 'Escape') setEditIndex(null);
+                  if (e.key === 'Escape') setEditId(null);
                 }}
                 autoFocus
               />
             ) : (
-              <span className={`${styles.text} ${todo.done ? styles.textDone : ''}`} onDoubleClick={() => editMode(index)}>
+              <span
+                className={`${styles.text} ${todo.done ? styles.textDone : ''}`}
+                onDoubleClick={() => editMode(todo.id)}
+              >
                 {todo.text}
               </span>
             )}
-            {editIndex !== index && (<button type="button" onClick={() => editMode(index)}>編集</button>)}
-            <button type="button" onClick={() => requestRemove(index)}>
+
+            {editId !== todo.id && (
+              <button type="button" onClick={() => editMode(todo.id)}>
+                編集
+              </button>
+            )}
+            <button type="button" onClick={() => requestRemove(todo.id)}>
               削除
             </button>
           </li>
