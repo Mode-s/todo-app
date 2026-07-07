@@ -49,7 +49,7 @@ export default function Home() {
       <ul className={styles.list}>
         {todos.map((todo, index) => (
           <li className={styles.item} key={index}>
-            <button type="button" role="checkbox" aria-checked={todo.done} aria-label={todo.done ? '未完了に戻す' : '完了にする'} onClick={() => toggleTodo(index)}>
+            <button className={styles.checkButton} type="button" role="checkbox" aria-checked={todo.done} aria-label={todo.done ? '未完了に戻す' : '完了にする'} onClick={() => toggleTodo(index)}>
               <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
                 <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}>
                   {/* 枠。doneが切り替わるたびkeyでDOMを作り直し、CSSアニメーションを再生させる */}
@@ -60,7 +60,7 @@ export default function Home() {
                 </g>
               </svg>
             </button>
-            <span>{todo.text}</span>
+            <span className={`${styles.text} ${todo.done ? styles.textDone : ''}`}>{todo.text}</span>
             <button type="button" onClick={() => removeTodo(index)}>
               削除
             </button>
